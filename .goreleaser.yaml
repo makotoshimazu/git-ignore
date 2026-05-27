@@ -49,5 +49,7 @@ brews:
     description: Append templates from github/gitignore to a local .gitignore file.
     license: Apache-2.0
     skip_upload: true
+    extra_install: |
+      generate_completions_from_executable(bin/"git-ignore", "completion", shells: [:zsh])
     test: |
       system "#{bin}/git-ignore", "--version"

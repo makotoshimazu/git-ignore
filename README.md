@@ -53,6 +53,8 @@ ttl_seconds = 600
 
 ## Completion
 
+Homebrewでインストールした場合、zsh completionはHomebrewの `share/zsh/site-functions` に自動で配置されます。
+
 ```sh
 git-ignore completion zsh > ~/.zsh/completions/_git-ignore
 git-ignore completion bash > ~/.bash_completion.d/git-ignore

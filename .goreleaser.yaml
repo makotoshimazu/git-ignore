@@ -1,0 +1,52 @@
+version: 2
+
+project_name: git-ignore
+
+before:
+  hooks:
+    - cargo test --locked
+
+builds:
+  - id: git-ignore
+    builder: rust
+    binary: git-ignore
+    targets:
+      - x86_64-apple-darwin
+      - aarch64-apple-darwin
+      - x86_64-unknown-linux-gnu
+      - aarch64-unknown-linux-gnu
+
+archives:
+  - id: default
+    formats:
+      - tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- .Os }}_
+      {{- .Arch }}
+
+checksum:
+  name_template: checksums.txt
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+brews:
+  - name: git-ignore
+    repository:
+      owner: makotoshimazu
+      name: homebrew-tap
+    directory: Formula
+    homepage: https://github.com/makotoshimazu/git-ignore
+    description: Append templates from github/gitignore to a local .gitignore file.
+    license: Apache-2.0
+    test: |
+      system "#{bin}/git-ignore", "--version"

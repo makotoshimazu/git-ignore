@@ -18,8 +18,12 @@ use crate::version::version_string;
 #[command(about = "Append templates from github/gitignore to a local .gitignore file.")]
 #[command(disable_version_flag = true)]
 struct Cli {
-    #[arg(long, global = true, help = "Bypass local cache and fetch fresh data.")]
-    no_cache: bool,
+    #[arg(
+        long,
+        global = true,
+        help = "Fetch fresh data and update the local cache."
+    )]
+    refresh_cache: bool,
 
     #[arg(long = "version", global = true, help = "Print version information.")]
     version: bool,
@@ -79,7 +83,7 @@ where
         config,
         cache,
         client,
-        no_cache: cli.no_cache,
+        refresh_cache: cli.refresh_cache,
     };
 
     match cli.command {
@@ -132,19 +136,19 @@ struct GitignoreService {
     config: AppConfig,
     cache: CacheStore,
     client: GitignoreClient,
-    no_cache: bool,
+    refresh_cache: bool,
 }
 
 impl GitignoreService {
     fn list_templates(&self) -> Result<Vec<Template>> {
-        if self.cache_enabled()
+        if self.cache_read_enabled()
             && let Some(templates) = self.cache.load_manifest(self.config.cache.ttl)?
         {
             return Ok(templates);
         }
 
         let templates = self.client.fetch_manifest()?;
-        if self.cache_enabled() {
+        if self.cache_write_enabled() {
             self.cache.save_manifest(&templates)?;
         }
 
@@ -176,7 +180,7 @@ impl GitignoreService {
     }
 
     fn template_content(&self, template: &Template) -> Result<String> {
-        if self.cache_enabled()
+        if self.cache_read_enabled()
             && let Some(content) = self
                 .cache
                 .load_template(&template.file_name, self.config.cache.ttl)?
@@ -185,14 +189,18 @@ impl GitignoreService {
         }
 
         let content = self.client.fetch_template(template)?;
-        if self.cache_enabled() {
+        if self.cache_write_enabled() {
             self.cache.save_template(&template.file_name, &content)?;
         }
         Ok(content)
     }
 
-    fn cache_enabled(&self) -> bool {
-        self.config.cache.enabled && !self.no_cache
+    fn cache_read_enabled(&self) -> bool {
+        self.config.cache.enabled && !self.refresh_cache
+    }
+
+    fn cache_write_enabled(&self) -> bool {
+        self.config.cache.enabled || self.refresh_cache
     }
 }
 
@@ -325,7 +333,7 @@ mod tests {
     }
 
     #[test]
-    fn no_cache_bypasses_existing_manifest_cache() {
+    fn refresh_cache_updates_existing_manifest_cache() {
         let server = MockServer::start();
         let temp = TempDir::new().unwrap();
         let cache_dir = temp.path().join("cache");
@@ -337,10 +345,10 @@ mod tests {
         .unwrap();
 
         let output = run_with_context(
-            ["git-ignore", "--no-cache", "list"],
+            ["git-ignore", "--refresh-cache", "list"],
             temp.path(),
             RuntimeContext::new(
-                AppPaths::new(cache_dir, temp.path().join("config.toml")),
+                AppPaths::new(cache_dir.clone(), temp.path().join("config.toml")),
                 server.endpoints(),
             ),
         )
@@ -348,6 +356,12 @@ mod tests {
         .unwrap();
 
         assert_eq!(output, "Node\nRust\n");
+        assert_eq!(server.request_count(), 1);
+        assert!(
+            fs::read_to_string(cache_dir.join("manifest.json"))
+                .unwrap()
+                .contains("\"Node\"")
+        );
     }
 
     fn test_context(path: &Path, server: &MockServer) -> RuntimeContext {

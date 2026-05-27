@@ -18,7 +18,7 @@ git-ignore --version
 git-ignore
 git-ignore list
 git-ignore Node
-git-ignore --no-cache list
+git-ignore --refresh-cache list
 git-ignore cache clear
 git-ignore completion zsh
 git-ignore completion bash
@@ -49,7 +49,7 @@ enabled = true
 ttl_seconds = 600
 ```
 
-`--no-cache` は設定ファイルより優先され、その実行ではキャッシュを読まず、書き込みもしません。
+`--refresh-cache` は設定ファイルより優先され、その実行ではネットワークから取得し直してローカルキャッシュを更新します。
 
 ## Completion
 

@@ -48,5 +48,6 @@ brews:
     homepage: https://github.com/makotoshimazu/git-ignore
     description: Append templates from github/gitignore to a local .gitignore file.
     license: Apache-2.0
+    skip_upload: true
     test: |
       system "#{bin}/git-ignore", "--version"

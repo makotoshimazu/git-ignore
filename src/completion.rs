@@ -23,18 +23,18 @@ _git_ignore() {
 }
 "#;
 
-const ZSH: &str = r#"#compdef git-ignore git-ignore
+const ZSH: &str = r#"#compdef git-ignore
 
-_git_ignore() {
+_git-ignore() {
   local -a candidates
   candidates=("${(@f)$(git-ignore __complete "${words[CURRENT]}" 2>/dev/null)}")
-  _describe 'gitignore templates' candidates
+  compadd -- "${candidates[@]}"
 }
 
-compdef _git_ignore git-ignore
+compdef _git-ignore git-ignore
 
 # Git's zsh completion can look for _git-<subcommand> helpers for external commands.
-_git-ignore() {
-  _git_ignore "$@"
+_git_ignore() {
+  _git-ignore "$@"
 }
 "#;

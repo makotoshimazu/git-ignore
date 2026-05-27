@@ -283,7 +283,7 @@ mod tests {
         .unwrap();
 
         assert!(output.contains("git-ignore __complete"));
-        assert!(output.contains("compdef _git_ignore git-ignore"));
+        assert!(output.contains("compdef _git-ignore git-ignore"));
     }
 
     #[test]

@@ -4,11 +4,8 @@
 
 ## Install
 
-Homebrew配布はGitHub ReleasesとGoReleaserで行う想定です。
-
 ```sh
-brew tap makotoshimazu/tap
-brew install git-ignore
+brew install makotoshimazu/tap/git-ignore
 ```
 
 ## Usage
@@ -35,7 +32,7 @@ git ignore Node
 
 ## Cache
 
-テンプレート一覧と取得済みテンプレートはデフォルトで10分間キャッシュします。
+テンプレート一覧と取得済みテンプレートはデフォルトで24時間キャッシュします。
 
 - manifest: `~/.cache/git-ignore/manifest.json`
 - templates: `~/.cache/git-ignore/templates/{Name}.gitignore`
@@ -46,7 +43,7 @@ git ignore Node
 ```toml
 [cache]
 enabled = true
-ttl_seconds = 600
+ttl_seconds = 86400
 ```
 
 `--refresh-cache` は設定ファイルより優先され、その実行ではネットワークから取得し直してローカルキャッシュを更新します。
@@ -54,6 +51,8 @@ ttl_seconds = 600
 ## Completion
 
 Homebrewでインストールした場合、zsh completionはHomebrewの `share/zsh/site-functions` に自動で配置されます。
+
+自分で足す場合は、以下のコマンドを使ってください。
 
 ```sh
 git-ignore completion zsh > ~/.zsh/completions/_git-ignore
@@ -76,10 +75,6 @@ cargo test
 goreleaser check
 goreleaser release --snapshot --clean --skip=publish
 ```
-
-## Release
-
-GoReleaserでmacOS/Linux向けのx86_64/aarch64バイナリとHomebrew tap更新を作成します。npm配布はv1後続タスクです。
 
 ## License
 

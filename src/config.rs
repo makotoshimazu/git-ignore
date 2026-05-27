@@ -7,7 +7,7 @@ use serde::Deserialize;
 use crate::paths::AppPaths;
 
 const DEFAULT_CACHE_ENABLED: bool = true;
-const DEFAULT_TTL_SECONDS: u64 = 600;
+const DEFAULT_TTL_SECONDS: u64 = 86_400;
 
 #[derive(Clone, Debug)]
 pub(crate) struct AppConfig {

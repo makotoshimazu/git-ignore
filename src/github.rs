@@ -150,7 +150,7 @@ fn templates_from_contents(contents: Vec<GithubContent>) -> Vec<Template> {
         })
         .collect::<Vec<_>>();
 
-    templates.sort_by(|left, right| left.name.to_lowercase().cmp(&right.name.to_lowercase()));
+    templates.sort_by_key(|template| template.name.to_lowercase());
     templates
 }
 
